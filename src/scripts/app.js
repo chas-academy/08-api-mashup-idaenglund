@@ -1,7 +1,6 @@
 import "../styles/app.scss";
 
-
-//import { getPromiseDataFromArray } from "./helpers"; 
+import { getPromiseDataFromArray } from "./helpers";
 
 (function() {
   function fetchFlickrPhotos(query) {
@@ -11,7 +10,6 @@ import "../styles/app.scss";
     let tags = encodeURI(query);
     let license = encodeURIComponent('4,5,6,9,10');
     let flickrAPIkey = process.env.FLICKR_API_KEY;
-  
 
     /** License numbers
     * 4 = Attribution License               https://creativecommons.org/licenses/by/2.0/" />
@@ -28,41 +26,21 @@ import "../styles/app.scss";
       `&text=${searchString}&content_type=1&per_page=${resultsPerPage}&tags=${tags}&privacy_filter=1&extras=url_o&format=json&nojsoncallback=1`;
     
     let flickrUrl = `${resourceUrl}${flickrQueryParams}`;
-   
 
-    fetch(flickrUrl)
-      .then(res => res.json())
-      .then(res => {
-  
-        return fetch(flickrUrl);
-        // Promise
 
-      })
-
-      .catch(err => (err));
+    return fetch(flickrUrl);
   }
 
 
   function fetchWordlabWords(query) {
     let wordLabAPIkey = process.env.BHT_API_KEY;
-    debugger; 
     let wordLabUrl = `https://words.bighugelabs.com/api/2/${wordLabAPIkey}/${query}/json`;
       
+           // res.noun.syn.map(function(result){ 
 
+        //   console.log(res.noun.syn); }
 
-    fetch(wordLabUrl)
-      .then(res => res.json())
-      .then(res => {
-        
-        
-        return fetch(wordLabUrl)
-        // res.noun.syn.map(function(result){ 
-
-        //   console.log(res.noun.syn); 
-       
-        // })
-      })
-      .catch(err => (err));
+    return fetch(wordLabUrl);
   };
 
 
@@ -79,15 +57,46 @@ import "../styles/app.scss";
     //   }
     //fetchWordlabWords(query); 
 
-    let apiCAlls = [
+    let apiCalls = [
       fetchFlickrPhotos(query), // this is a promise
       fetchWordlabWords(query) // this is also a promise
     ];
 
-    Promise.all(apiCAlls)
-    .then((res) => {
-      return res.map(type => type.json());
-    })
-    .catch(reject); 
-  }  
+    // Returnerar ett promise!
+    getPromiseDataFromArray(apiCalls)
+      .then((res) => {
+        renderFlickrPhotos(res[0]); // First element will always be flickr data
+        renderSidebarSuggestions(res[1]); // Second element will always be bht data
+      });
+  }
+
+  function renderFlickrPhotos(flickrData) {
+    document.querySelector('.results ul').innerHTML = "";
+    
+    flickrData.photos.photo.map((photo) => {
+      let liEl = document.createElement('li');
+      let imgEl = document.createElement('img');
+      
+      imgEl.src = photo.url_o;
+      liEl.appendChild(imgEl);
+      liEl.classList.add('result');
+
+      document.querySelector('.results ul').appendChild(liEl);
+      // 1. Create an li element
+      // 2. Set the background-image property liEl.style.backgroundImage = `${photo.url_o}`
+      // 3. Maybe create a p element
+      // 4. liEl.appenChild(pEl);
+      // 5. document.querySelector('.results ul').appendChild(liEl);
+    });
+  }
+
+  function renderSidebarSuggestions(bhtData) {
+      // 0. Massage the bhtData (suggestion: make it into an array of strings, easier that way)
+      // 1. Create an li element
+      // 2. Set the background-image property liEl.style.backgroundImage = `${photo.url_o}`
+      // 3. Maybe create a p element
+      // 4. liEl.appenChild(pEl);
+      // 5. document.querySelector('.results ul').appendChild(liEl);
+  }
+
 })(); 

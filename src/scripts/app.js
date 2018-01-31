@@ -1,5 +1,7 @@
 import "../styles/app.scss";
-import { debug } from "util";
+
+
+//import { getPromiseDataFromArray } from "./helpers"; 
 
 (function() {
   function fetchFlickrPhotos(query) {
@@ -8,7 +10,8 @@ import { debug } from "util";
     let resultsPerPage = 10;
     let tags = encodeURI(query);
     let license = encodeURIComponent('4,5,6,9,10');
-    let flickrAPIkey = "18e13a01f3ad5cfa61400cf85e329ac4";
+    let flickrAPIkey = process.env.FLICKR_API_KEY;
+  
 
     /** License numbers
     * 4 = Attribution License               https://creativecommons.org/licenses/by/2.0/" />
@@ -25,16 +28,14 @@ import { debug } from "util";
       `&text=${searchString}&content_type=1&per_page=${resultsPerPage}&tags=${tags}&privacy_filter=1&extras=url_o&format=json&nojsoncallback=1`;
     
     let flickrUrl = `${resourceUrl}${flickrQueryParams}`;
+   
 
     fetch(flickrUrl)
       .then(res => res.json())
       .then(res => {
-
-        console.log(res.noun.syn);
-        
-        //fetchFlickrPhotos(res);   
-
-        //document.getElementById("imageid").src="../template/save.png";
+  
+        return fetch(flickrUrl);
+        // Promise
 
       })
 
@@ -43,7 +44,8 @@ import { debug } from "util";
 
 
   function fetchWordlabWords(query) {
-    let wordLabAPIkey = "fac5a1c372ca65318eaaa1c3b0548d69";
+    let wordLabAPIkey = process.env.BHT_API_KEY;
+    debugger; 
     let wordLabUrl = `https://words.bighugelabs.com/api/2/${wordLabAPIkey}/${query}/json`;
       
 
@@ -51,35 +53,41 @@ import { debug } from "util";
     fetch(wordLabUrl)
       .then(res => res.json())
       .then(res => {
-  
-        res.noun.syn.map(function(result){ 
+        
+        
+        return fetch(wordLabUrl)
+        // res.noun.syn.map(function(result){ 
 
-          console.log(res.noun.syn); 
-          /*let li = document.createElement('li'),
-          h3 = document.createElement('h3'); 
-
-        li.innerHTML = ` <p>${res.noun.syn}</p>`
-
-        li.appendChild('h3'); 
-        document.getElementsByClassName('results').appendChild('li')
-        */
-
-          })
-    
+        //   console.log(res.noun.syn); 
+       
+        // })
       })
-      .catch(err => console.error(err));
-  }
+      .catch(err => (err));
+  };
 
-  // fetchWordlabWords("detest"); 
 
   let searchBtn = document.querySelector('.search-btn');
   
   searchBtn.addEventListener('click', onSearch);
 
   function onSearch(event) {
-    event.preventDefault(); // prevent the form from reloading the page, since it's now a form element
-    let searchString = event.currentTarget.form.elements[0].value;
-    fetchWordlabWords(searchString); 
+    event.preventDefault();
+      // prevent the form from reloading the page, since it's now a form element
+    let query = event.currentTarget.form.elements[0].value;
+    // if (!query.length){  Lägg till om söket är tomt. 
+    //   return; // Can't search on nothing
+    //   }
+    //fetchWordlabWords(query); 
 
-  }
-})();
+    let apiCAlls = [
+      fetchFlickrPhotos(query), // this is a promise
+      fetchWordlabWords(query) // this is also a promise
+    ];
+
+    Promise.all(apiCAlls)
+    .then((res) => {
+      return res.map(type => type.json());
+    })
+    .catch(reject); 
+  }  
+})(); 

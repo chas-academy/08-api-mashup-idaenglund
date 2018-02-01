@@ -23,7 +23,7 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
       `https://api.flickr.com/services/rest?sort=relevance&parse_tags=1&content_type=7&license=${license}&method=flickr.photos.search&api_key=${flickrAPIkey}`
 
     let flickrQueryParams =
-      `&text=${searchString}&content_type=1&per_page=${resultsPerPage}&tags=${tags}&privacy_filter=1&extras=url_o&format=json&nojsoncallback=1`;
+      `&text=${searchString}&content_type=1&per_page=${resultsPerPage}&tags=${tags}&privacy_filter=1&extras=url_m&format=json&nojsoncallback=1`;
     
     let flickrUrl = `${resourceUrl}${flickrQueryParams}`;
 
@@ -81,7 +81,7 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
       let liEl = document.createElement('li');
       //let imgEl = document.createElement('img');
       
-      liEl.style.backgroundImage = `url(${photo.url_o})`; 
+      liEl.style.backgroundImage = `url(${photo.url_m})`; 
       //imgEl.src = photo.url_o;
       //liEl.appendChild(imgEl);
       liEl.classList.add('result');

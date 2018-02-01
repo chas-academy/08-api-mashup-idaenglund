@@ -1,6 +1,6 @@
 import "../styles/app.scss";
 
-import { getPromiseDataFromArray } from "./helpers";
+import { getPromiseDataFromArray, flatten } from "./helpers";
 
 (function() {
   function fetchFlickrPhotos(query) {
@@ -28,7 +28,7 @@ import { getPromiseDataFromArray } from "./helpers";
     let flickrUrl = `${resourceUrl}${flickrQueryParams}`;
 
 
-    return fetch(flickrUrl);
+    return fetch(flickrUrl); // Returnerar ett promise 
   }
 
 
@@ -40,7 +40,7 @@ import { getPromiseDataFromArray } from "./helpers";
 
         //   console.log(res.noun.syn); }
 
-    return fetch(wordLabUrl);
+    return fetch(wordLabUrl) // Returnerar ett promise
   };
 
 
@@ -50,39 +50,42 @@ import { getPromiseDataFromArray } from "./helpers";
 
 
   function onSearch(event) {
+ 
     event.preventDefault();
       // prevent the form from reloading the page, since it's now a form element
     let query = event.currentTarget.form.elements[0].value;
-    // if (!query.length){  Lägg till om söket är tomt. 
-    //   return; // Can't search on nothing
-    //   }
   
-
-    let apiCalls = [
+    let apiCalls = [   // En array som innehåller våra promises 
       fetchFlickrPhotos(query), // this is a promise
       fetchWordlabWords(query) // this is also a promise
     ];
 
     // Returnerar ett promise!
     getPromiseDataFromArray(apiCalls)
-      .then((res) => {
+      .then((res) => { // Måste resolva promiset
         renderFlickrPhotos(res[0]); // First element will always be flickr data
         renderSidebarSuggestions(res[1]); // Second element will always be bht data
-      });
+      })
+        .catch(reason => {
+          // Todo: Show error message to user 
+          return console.error(reason); 
+      }); 
   }
 
   function renderFlickrPhotos(flickrData) {
+   
     let resultHolder = document.querySelector('.results ul'); 
     resultHolder.innerHTML = "";
     
     flickrData.photos.photo.map((photo) => {
       let liEl = document.createElement('li');
-      let imgEl = document.createElement('img');
+      //let imgEl = document.createElement('img');
       
       liEl.style.backgroundImage = `url(${photo.url_o})`; 
       //imgEl.src = photo.url_o;
-      liEl.appendChild(imgEl);
+      //liEl.appendChild(imgEl);
       liEl.classList.add('result');
+     
 
       resultHolder.appendChild(liEl);
       // 1. Create an li element
@@ -94,6 +97,7 @@ import { getPromiseDataFromArray } from "./helpers";
   }
 
   function renderSidebarSuggestions(bhtData) {
+    
       // 0. Massage the bhtData (suggestion: make it into an array of strings, easier that way)
       // 1. Create an li element
       // 2. Set the background-image property liEl.style.backgroundImage = `${photo.url_o}`
@@ -103,3 +107,26 @@ import { getPromiseDataFromArray } from "./helpers";
   }
 
 })(); 
+
+
+/*
+   let words = Object.keys(bhtData).map(key => {
+          return Object.values(bhtData[key]).map(word => {
+          return word; 
+
+        }); 
+      }); 
+
+      words = flatten(words); 
+
+      const frag = document.createDocumentFragment(); 
+      words.map((word) => {
+        let liEl = document.createElement('li'); 
+        let aEl = document.createElement('a'); 
+
+        aEl.href = "#"; 
+        aEl.textContent = word; 
+
+        liEl.appendChild('li'); 
+        aEl.appendChild('frag');
+        */

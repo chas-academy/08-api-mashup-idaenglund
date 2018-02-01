@@ -48,6 +48,7 @@ import { getPromiseDataFromArray } from "./helpers";
   
   searchBtn.addEventListener('click', onSearch);
 
+
   function onSearch(event) {
     event.preventDefault();
       // prevent the form from reloading the page, since it's now a form element
@@ -55,7 +56,7 @@ import { getPromiseDataFromArray } from "./helpers";
     // if (!query.length){  Lägg till om söket är tomt. 
     //   return; // Can't search on nothing
     //   }
-    //fetchWordlabWords(query); 
+  
 
     let apiCalls = [
       fetchFlickrPhotos(query), // this is a promise
@@ -71,17 +72,19 @@ import { getPromiseDataFromArray } from "./helpers";
   }
 
   function renderFlickrPhotos(flickrData) {
-    document.querySelector('.results ul').innerHTML = "";
+    let resultHolder = document.querySelector('.results ul'); 
+    resultHolder.innerHTML = "";
     
     flickrData.photos.photo.map((photo) => {
       let liEl = document.createElement('li');
       let imgEl = document.createElement('img');
       
-      imgEl.src = photo.url_o;
+      liEl.style.backgroundImage = `url(${photo.url_o})`; 
+      //imgEl.src = photo.url_o;
       liEl.appendChild(imgEl);
       liEl.classList.add('result');
 
-      document.querySelector('.results ul').appendChild(liEl);
+      resultHolder.appendChild(liEl);
       // 1. Create an li element
       // 2. Set the background-image property liEl.style.backgroundImage = `${photo.url_o}`
       // 3. Maybe create a p element

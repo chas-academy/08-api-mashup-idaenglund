@@ -38,10 +38,6 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
       query
     }/json`;
 
-    // res.noun.syn.map(function(result){
-
-    //   console.log(res.noun.syn); }
-
     return fetch(wordLabUrl); // Returnerar ett promise
   }
 
@@ -49,27 +45,28 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
 
   searchBtn.addEventListener("click", onSearch);
 
-  function onSearch(event, searchquery=null) {
-    event.preventDefault();
-    // prevent the form from reloading the page, since it's now a form element
-    let query = searchquery ? searchquery : event.currentTarget.form.elements[0].value;
+  function onSearch(event, searchquery=null) { // Send in a searchquery so we can use the words on the sidebar for search
+    event.preventDefault(); // prevent the form from reloading the page, since it's now a form element
+    let query = searchquery ? searchquery : event.currentTarget.form.elements[0].value; // check if there is a searchquery, then use that as value, else use the value you write in the inputfield. 
 
     let apiCalls = [
       // En array that contains our promises
-      fetchFlickrPhotos(query), // this is a promise
-      fetchWordlabWords(query) // this is also a promise
+      fetchFlickrPhotos(query), 
+      fetchWordlabWords(query) 
     ];
 
     // Return a promise!
     getPromiseDataFromArray(apiCalls)
       .then(res => {
-        // Måste resolva promiset
         renderFlickrPhotos(res[0]); // First element will always be flickr data
         renderSidebarSuggestions(res[1]); // Second element will always be bht data
       })
       .catch(reason => {
-        // Todo: Show error message to user
-        return reason;
+        console.log(reason);
+        let errormessage = document.querySelector(".results ul");
+        errormessage.innerHTML = `<li  class="result"><h3>${reason}<h3></li>` 
+
+            // Todo: Show error message to user
       });
   }
 
@@ -121,7 +118,7 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
     sidebarWordHolder.innerHTML = "";
 
     sidebarWordHolder.appendChild(frag);
-    aEl.href.appendChild(liEl); 
+    //aEl.href.appendChild(liEl); 
  
 
     // 0. Massage the bhtData (suggestion: make it into an array of strings, easier that way)

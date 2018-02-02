@@ -93,8 +93,32 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
 
   function renderSidebarSuggestions(bhtData) {
     let words = bhtData.noun.syn;
+    
     words = flatten(words);
-    debugger; 
+
+    const frag = document.createDocumentFragment();
+
+   words.forEach(word => {
+
+    let liEl = document.createElement('li');
+    let aEl =  document.createElement('a');
+   
+    liEl.classList.add("sidebar"); 
+    
+    aEl.href = "#";
+    aEl.textContent = word;
+
+    liEl.appendChild(aEl);
+    frag.appendChild(liEl);
+   
+  }); 
+
+
+    const sidebarWordHolder = document.querySelector('aside ul');
+    sidebarWordHolder.innerHTML = "";
+
+    sidebarWordHolder.appendChild(frag);
+debugger; 
     // 0. Massage the bhtData (suggestion: make it into an array of strings, easier that way)
     // 1. Create an li element
     // 2. Set the background-image property liEl.style.backgroundImage = `${photo.url_o}`

@@ -49,18 +49,18 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
 
   searchBtn.addEventListener("click", onSearch);
 
-  function onSearch(event) {
+  function onSearch(event, searchquery=null) {
     event.preventDefault();
     // prevent the form from reloading the page, since it's now a form element
-    let query = event.currentTarget.form.elements[0].value;
+    let query = searchquery ? searchquery : event.currentTarget.form.elements[0].value;
 
     let apiCalls = [
-      // En array som innehåller våra promises
+      // En array that contains our promises
       fetchFlickrPhotos(query), // this is a promise
       fetchWordlabWords(query) // this is also a promise
     ];
 
-    // Returnerar ett promise!
+    // Return a promise!
     getPromiseDataFromArray(apiCalls)
       .then(res => {
         // Måste resolva promiset
@@ -98,10 +98,13 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
 
     const frag = document.createDocumentFragment();
 
+
    words.forEach(word => {
 
     let liEl = document.createElement('li');
     let aEl =  document.createElement('a');
+
+    liEl.addEventListener('click', (e) => onSearch(e, word)); 
    
     liEl.classList.add("sidebar"); 
     
@@ -118,7 +121,9 @@ import { getPromiseDataFromArray, flatten } from "./helpers";
     sidebarWordHolder.innerHTML = "";
 
     sidebarWordHolder.appendChild(frag);
-debugger; 
+    aEl.href.appendChild(liEl); 
+ 
+
     // 0. Massage the bhtData (suggestion: make it into an array of strings, easier that way)
     // 1. Create an li element
     // 2. Set the background-image property liEl.style.backgroundImage = `${photo.url_o}`
